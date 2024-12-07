@@ -1,0 +1,36 @@
+<mat-card class="sign-up-card">
+    <mat-card-title>Sign Up</mat-card-title>
+    <form [formGroup]="signupForm" (ngSubmit)="signUp()">
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" />
+            <mat-error *ngIf="signupForm.get('email')!.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="signupForm.get('email')!.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+  
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password" type="password" />
+        <mat-error *ngIf="signupForm.get('password')!.hasError('required')">Password is required</mat-error>
+        <mat-error *ngIf="signupForm.get('password')!.hasError('minlength')">
+          Password must be at least 6 characters
+        </mat-error>
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput formControlName="confirmPassword" type="password" />
+        <mat-error *ngIf="signupForm.get('confirmPassword')!.hasError('required')">Confirm Password is required</mat-error>
+        <mat-error *ngIf="signupForm.get('confirmPassword')!.hasError('minlength')">
+          Password must be at least 6 characters
+        </mat-error>
+        <!-- <mat-error *ngIf="!signupForm.get('password')!.equalsIgnoreCase(signupForm.get('confirmPassword'))">
+            Passwords must match
+          </mat-error> -->
+      </mat-form-field>
+  
+      <button mat-raised-button color="primary" type="submit" [disabled]="signupForm.invalid">
+        Sign Up
+      </button>
+    </form>
+  </mat-card>

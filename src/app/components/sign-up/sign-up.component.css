@@ -1,0 +1,24 @@
+.sign-up-card {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  width: 100%;
+  margin-top: 16px;
+}
+
+/* Additional styling for the button */
+button:disabled {
+  background-color: #e0e0e0;
+}
