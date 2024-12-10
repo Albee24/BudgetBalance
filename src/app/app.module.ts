@@ -17,8 +17,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDialogModule } from '@angular/material/dialog';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthService } from './shared/services/auth.service';
+import { ManageBudgetDialogComponent } from './components/manage-budget-dialog/manage-budget-dialog.component';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { ManageTransactionsDialogComponent } from './components/manage-transactions-dialog/manage-transactions-dialog.component';
+import { authGuard } from './shared/guard/auth.guard';
 
 @NgModule({
   declarations: [
@@ -27,29 +35,36 @@ import { AuthService } from './shared/services/auth.service';
     SignUpComponent, 
     ForgotPasswordComponent, 
     DashboardComponent, 
-    VerifyEmailComponent
+    VerifyEmailComponent,
+    ManageBudgetDialogComponent,
+    ConfirmDialogComponent,
+    ManageTransactionsDialogComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     RouterOutlet,
-    RouterModule.forRoot([  // Configure routes here
+    RouterModule.forRoot([
       { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
       { path: 'sign-in', component: SignInComponent },
       { path: 'sign-up', component: SignUpComponent },
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
       { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'verify-email-address', component: VerifyEmailComponent }, 
       ]),
     ReactiveFormsModule,
     AngularFireModule.initializeApp(firebaseConfig),  // Initialize Firebase with config
+    AngularFirestoreModule,
     AngularFireAuthModule,  // Firebase Authentication module
     MatInputModule,
     MatButtonModule,
     MatFormFieldModule,
     MatCardModule,
     MatIconModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatMenuModule,
+    MatExpansionModule,
+    MatDialogModule
   ],
   bootstrap: [AppComponent],
   providers: [AuthService]

@@ -1,0 +1,11 @@
+.scrollable-content {
+    flex: 1; /* Takes up the bottom half of the dialog */
+    overflow-y: auto; /* Enables vertical scrolling */
+    max-height: 50%; /* Ensures it takes up at most half of the dialog */
+    padding: 8px;
+  }
+    
+  
+  mat-form-field {
+    padding-right: 5px;
+  }

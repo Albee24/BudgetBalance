@@ -1,0 +1,46 @@
+<h2 mat-dialog-title>Manage Transactions</h2>
+<mat-dialog-content>
+    <form [formGroup]="transactionForm" (ngSubmit)="submit()">
+        <mat-form-field>
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name"/>
+            <mat-error *ngIf="transactionForm.get('name')!.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Amount</mat-label>
+            <input matInput formControlName="amount"/>
+            <mat-error *ngIf="transactionForm.get('amount')!.hasError('required')">Amount is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Recurring</mat-label>
+            <input matInput formControlName="recurring"/>
+            <mat-error *ngIf="transactionForm.get('recurring')!.hasError('required')">Recurring selection is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Frequency Type</mat-label>
+            <input matInput formControlName="frequencyType"/>
+            <mat-error *ngIf="transactionForm.get('frequencyType')!.hasError('required')">Frequency Type is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Frequency Number</mat-label>
+            <input matInput formControlName="frequencyNumber"/>
+            <mat-error *ngIf="transactionForm.get('frequencyNumber')!.hasError('required')">Frequency Number is required</mat-error>
+        </mat-form-field>
+        <button 
+            style="margin-left: 5%;"
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="transactionForm.invalid">
+            Add
+        </button>
+    </form>
+    <div class="scrollable-content">
+        <h3>Transactions</h3>
+        <p *ngFor="let tran of budget.transactions"> {{ tran.name }} {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{tran.recurring }} {{ tran.frequencyType }} {{ tran.frequencyNumber }}</p>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-button (click)="cancel()">Cancel</button>
+    <button mat-button (click)="save()">Save</button>
+  </mat-dialog-actions>

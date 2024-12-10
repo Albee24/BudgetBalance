@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Manage Budget</h2>
+<mat-dialog-content>
+    <form [formGroup]="budgetForm" (ngSubmit)="submit()">
+        <mat-form-field class="half-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" type="name" />
+            <mat-error *ngIf="budgetForm.get('name')!.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+        <mat-form-field class="half-width" style="margin-left: 5%;">
+            <mat-label>Balance</mat-label>
+            <input matInput formControlName="balance" type="balance" />
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="description" type="description" />
+        </mat-form-field>
+        <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="budgetForm.invalid">
+            Save
+        </button>
+    </form>
+</mat-dialog-content>

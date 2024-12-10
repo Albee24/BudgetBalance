@@ -5,7 +5,7 @@ import {
   AngularFirestoreDocument,
 } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
-import { User } from './user';
+import { User } from '../models/user';
 import { GoogleAuthProvider } from 'firebase/auth';
 @Injectable({
   providedIn: 'root',
@@ -113,8 +113,6 @@ export class AuthService {
     const userData: User = {
       uid: user.uid,
       email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
       emailVerified: user.emailVerified,
     };
     return userRef.set(userData, {

@@ -1,1 +1,36 @@
-<p>dashboard works!</p>
+<header class="header">
+    <div class="header-title">My Budgets</div>
+    <button mat-icon-button class="menu-button" (click)="createBudget()">
+        <mat-icon>add</mat-icon>
+    </button>
+</header>
+<div class="card-grid">
+    <mat-card *ngFor="let budget of budgets; let i = index" class="card">
+        <div class="main">
+            <h4>{{ budget.name }}</h4>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="editBudget(budget)">Edit</button>
+                <button mat-menu-item (click)="manageTransactions(budget)">Manage Transactions</button>
+                <button mat-menu-item style="color:red" (click)="deleteBudget(budget)">Delete</button>
+              </mat-menu>
+        </div>
+        <label>{{budget.balance | currency:'USD':'symbol':'1.2-2' }}</label>
+        <mat-expansion-panel (opened)="togglePanelState(i)" (closed)="togglePanelState(i)">
+            <mat-expansion-panel-header>
+            <mat-panel-title> Transactions </mat-panel-title>
+            </mat-expansion-panel-header>
+            <ul>
+                <li *ngFor="let tran of budgets[i].transactions">
+                    <strong>{{ tran.name }}</strong>
+                    - <mat-label>{{ tran.amount | currency:'USD':'symbol':'1.2-2'  }} </mat-label>
+                    - <mat-label>{{ tran.recurring }} </mat-label>
+                    - <mat-label>{{ tran.frequencyType }}</mat-label>
+                    - <mat-label>{{ tran.frequencyNumber }}</mat-label>
+                </li>
+            </ul>
+        </mat-expansion-panel>
+    </mat-card>
+</div>
