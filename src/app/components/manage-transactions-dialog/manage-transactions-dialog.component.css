@@ -9,3 +9,13 @@
   mat-form-field {
     padding-right: 5px;
   }
+
+  mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px; /* Optional to give space from the content */
+  }
+  
+  mat-dialog-actions button {
+    margin-left: 8px; /* Optional to space out buttons */
+  }

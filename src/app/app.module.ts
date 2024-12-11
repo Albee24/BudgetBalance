@@ -31,7 +31,9 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { NativeDateAdapter } from '@angular/material/core';
+import {provideNativeDateAdapter} from '@angular/material/core';
+import { RecurringTextPipe } from './shared/utils/recurring.pipe';
+import { DatePipe } from '@angular/common'; // Import DatePipe
 
 
 @NgModule({
@@ -44,7 +46,8 @@ import { NativeDateAdapter } from '@angular/material/core';
     VerifyEmailComponent,
     ManageBudgetDialogComponent,
     ConfirmDialogComponent,
-    ManageTransactionsDialogComponent
+    ManageTransactionsDialogComponent,
+    RecurringTextPipe
   ],
   imports: [
     BrowserModule,
@@ -77,6 +80,6 @@ import { NativeDateAdapter } from '@angular/material/core';
     MatNativeDateModule,
   ],
   bootstrap: [AppComponent],
-  providers: [AuthService, NativeDateAdapter]
+  providers: [AuthService, provideNativeDateAdapter(), DatePipe]
 })
 export class AppModule {}

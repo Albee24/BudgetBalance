@@ -14,12 +14,9 @@
             <mat-label>Description</mat-label>
             <input matInput formControlName="description" type="description" />
         </mat-form-field>
-        <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit" 
-            [disabled]="budgetForm.invalid">
-            Save
-        </button>
+        <mat-dialog-actions>
+            <button mat-raised-button color="secondary" (click)="cancelClick()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="budgetForm.invalid">Save</button>
+        </mat-dialog-actions>
     </form>
 </mat-dialog-content>

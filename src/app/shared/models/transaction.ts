@@ -5,7 +5,8 @@ export interface Transaction {
         amount: string;
         frequencyNumber: string;
         frequencyType: string;
-        recurring: boolean;
+        recurring: string;
         startDate: Timestamp;
+        untilDate: Timestamp;
         id?: string;
  }

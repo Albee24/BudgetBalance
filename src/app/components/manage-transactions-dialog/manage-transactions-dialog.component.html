@@ -11,18 +11,16 @@
             <input matInput formControlName="amount"/>
             <mat-error *ngIf="transactionForm.get('amount')!.hasError('required')">Amount is required</mat-error>
         </mat-form-field>
-        <mat-form-field class="example-full-width">
+        <mat-form-field>
             <mat-label>Date</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="startDate">
             <mat-hint>MM/DD/YYYY</mat-hint>
             <mat-datepicker #picker></mat-datepicker>
-            <button mat-button (click)="picker.open()" style="padding: 0; margin: 0;" matSuffix>
-              <mat-icon style="padding: 0; margin: 0;">event</mat-icon>
-            </button>
-          </mat-form-field>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        </mat-form-field>
         <mat-form-field>
             <mat-label>Recurring</mat-label>
-            <mat-select formControlName="recurring" (selectionChange)="recurringValueChange($event)">
+            <mat-select formControlName="recurring">
                 <mat-option [value]="'Yes'">Yes</mat-option>
                 <mat-option [value]="'No'">No</mat-option>
             </mat-select>
@@ -31,18 +29,30 @@
             </mat-error>
         </mat-form-field>
         <mat-form-field *ngIf="transactionForm.controls['recurring'].value === 'Yes'">
+            <mat-label>Every</mat-label>
+            <input matInput formControlName="frequencyNumber" type="number"/>
+            <mat-error *ngIf="transactionForm.get('frequencyNumber')!.hasError('required')">Frequency Number is required</mat-error>
+        </mat-form-field>
+        <mat-form-field *ngIf="transactionForm.controls['recurring'].value === 'Yes'">
             <mat-label>Frequency Type</mat-label>
-            <input matInput formControlName="frequencyType"/>
+            <mat-select formControlName="frequencyType">
+                <mat-option [value]="'Days'">Days</mat-option>
+                <mat-option [value]="'Weeks'">Weeks</mat-option>
+                <mat-option [value]="'Months'">Months</mat-option>
+                <mat-option [value]="'Years'">Years</mat-option>
+            </mat-select>
             <mat-error *ngIf="transactionForm.get('frequencyType')!.hasError('required')">Frequency Type is required</mat-error>
         </mat-form-field>
         <mat-form-field *ngIf="transactionForm.controls['recurring'].value === 'Yes'">
-            <mat-label>Frequency Number</mat-label>
-            <input matInput formControlName="frequencyNumber"/>
-            <mat-error *ngIf="transactionForm.get('frequencyNumber')!.hasError('required')">Frequency Number is required</mat-error>
+            <mat-label>Until</mat-label>
+            <input matInput [matDatepicker]="untilPicker" formControlName="untilDate">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker #untilPicker></mat-datepicker>
+            <mat-datepicker-toggle matIconSuffix [for]="untilPicker"></mat-datepicker-toggle>
         </mat-form-field>
         <button 
             style="margin-left: 5%;"
-            mat-raised-button 
+            mat-stroked-button 
             color="primary" 
             type="submit" 
             [disabled]="transactionForm.invalid">
@@ -51,11 +61,17 @@
     </form>
     <div class="scrollable-content">
         <h3>Transactions</h3>
-        <p *ngFor="let tran of budget.transactions; trackBy: trackByFn"> {{ tran.name }} {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{tran.recurring }} {{ tran.frequencyType }} {{ tran.frequencyNumber }}</p>
+        <div *ngFor="let tran of budget.transactions; trackBy: trackByFn"> 
+            <span>
+                <strong>{{ tran.name }}</strong> {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{ tran | recurringText }}
+                <button mat-icon-button color="warn" (click)="removeTransaction(tran)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </span>
+        </div>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button (click)="cancel()">Cancel</button>
-    <button mat-button (click)="save()">Save</button>
-    <button mat-icon-button (click)="save()"><mat-icon>save</mat-icon></button>
-  </mat-dialog-actions>
+    <button mat-raised-button color="secondary" (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="areTransactionsEqual(budget.transactions, startingTransactions)">Save</button>
+</mat-dialog-actions>

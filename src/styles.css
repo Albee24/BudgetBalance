@@ -1,6 +1,1 @@
 @import "../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css";
-
-.cdk-overlay-container [aria-hidden="true"] {
-    pointer-events: none;
-    display: none;
-  }

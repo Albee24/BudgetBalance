@@ -8,6 +8,8 @@
     <mat-card *ngFor="let budget of budgets; let i = index" class="card">
         <div class="main">
             <h4>{{ budget.name }}</h4>
+            &nbsp; - &nbsp;&nbsp;
+            <p><i>{{ budget.description }}</i></p>
             <button mat-icon-button [matMenuTriggerFor]="menu">
                 <mat-icon>more_vert</mat-icon>
             </button>
@@ -24,11 +26,7 @@
             </mat-expansion-panel-header>
             <ul>
                 <li *ngFor="let tran of budgets[i].transactions">
-                    <strong>{{ tran.name }}</strong>
-                    - <mat-label>{{ tran.amount | currency:'USD':'symbol':'1.2-2'  }} </mat-label>
-                    - <mat-label>{{ tran.recurring }} </mat-label>
-                    - <mat-label>{{ tran.frequencyType }}</mat-label>
-                    - <mat-label>{{ tran.frequencyNumber }}</mat-label>
+                    <strong>{{ tran.name }}</strong> {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{ tran | recurringText }}
                 </li>
             </ul>
         </mat-expansion-panel>

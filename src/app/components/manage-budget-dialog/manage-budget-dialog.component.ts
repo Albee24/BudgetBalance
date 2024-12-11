@@ -60,4 +60,8 @@ export class ManageBudgetDialogComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
+    cancelClick() {
+      this.dialogRef.close();
+    }
   }
