@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';  // Ensure you're using compat API for simplicity
 import { Observable } from 'rxjs';
 import { Transaction } from '../models/transaction';
-import { User } from '../models/user';
 import { Budget } from '../models/budget';
 
 @Injectable({
@@ -32,11 +31,12 @@ export class TransactionService {
   }
 
   getAllTransactions(budgetId: string): Observable<Transaction[]> {
+    console.log('getting all budgets for ' + budgetId);
     this.transactionsCollection = this.firestore.collection<Transaction>('users/' + this.user.uid + '/budgets/' +budgetId + '/transactions');
     return this.transactionsCollection.valueChanges();
   }
 
-  private deleteAllTransactions(budgetId: string): Promise<void> {
+  deleteAllTransactions(budgetId: string): Promise<void> {
     const transactionsRef = this.firestore.collection('users/' + this.user.uid + '/budgets/' +budgetId + '/transactions');
     return transactionsRef.get().toPromise().then(querySnapshot => {
       const batch = this.firestore.firestore.batch();

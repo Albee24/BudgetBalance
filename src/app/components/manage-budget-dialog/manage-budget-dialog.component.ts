@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, Inject, OnInit } from '@angular/c
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Budget } from '../../shared/models/budget';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-manage-budget-dialog',
@@ -25,6 +26,7 @@ export class ManageBudgetDialogComponent implements OnInit, AfterViewInit {
             name: '',
             balance: '0',
             description: '',
+            lastUpdated: Timestamp.fromDate(new Date()),
             transactions: []
           };
         }

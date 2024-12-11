@@ -27,6 +27,12 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 import { ManageTransactionsDialogComponent } from './components/manage-transactions-dialog/manage-transactions-dialog.component';
 import { authGuard } from './shared/guard/auth.guard';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { NativeDateAdapter } from '@angular/material/core';
+
 
 @NgModule({
   declarations: [
@@ -64,9 +70,13 @@ import { authGuard } from './shared/guard/auth.guard';
     MatToolbarModule,
     MatMenuModule,
     MatExpansionModule,
-    MatDialogModule
+    MatDialogModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   bootstrap: [AppComponent],
-  providers: [AuthService]
+  providers: [AuthService, NativeDateAdapter]
 })
 export class AppModule {}

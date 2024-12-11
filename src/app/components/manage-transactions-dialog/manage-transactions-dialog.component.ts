@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Budget } from '../../shared/models/budget';
 import { TransactionService } from '../../shared/services/transaction.service';
+import { Transaction } from '../../shared/models/transaction';
 
 @Component({
   selector: 'app-manage-transactions-dialog',
@@ -22,7 +23,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
 
     ngOnInit(): void {
         this.budget = this.data.budget;
-        if (!this.budget.transactions && this.budget.id) {
+        if (this.budget.transactions.length == 0 && this.budget.id) {
           this.transactionService.getAllTransactions(this.budget.id).subscribe(result => {
             if (result)
               this.budget.transactions = result;
@@ -46,7 +47,8 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
         amount: new FormControl('',Validators.required),
         frequencyType: new FormControl('',Validators.required),
         frequencyNumber: new FormControl('',Validators.required),
-        recurring: new FormControl('',Validators.required)
+        recurring: new FormControl('',Validators.required),
+        startDate: new FormControl('',Validators.required)
       })
     }
   
@@ -59,6 +61,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
             frequencyType: this.transactionForm.controls['frequencyType'].value,
             frequencyNumber: this.transactionForm.controls['frequencyNumber'].value,
             recurring: this.transactionForm.controls['recurring'].value,
+            startDate: this.transactionForm.controls['startDate'].value
           }
           this.budget.transactions?.push(transaction);
           this.transactionForm.controls['name'].setValue('');
@@ -66,6 +69,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
           this.transactionForm.controls['frequencyType'].setValue('');
           this.transactionForm.controls['frequencyNumber'].setValue('');
           this.transactionForm.controls['recurring'].setValue('');
+          this.transactionForm.controls['startDate'].setValue('');
         }
       }
     }
@@ -76,5 +80,21 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
 
     cancel() {
       this.dialogRef.close();
+    }
+
+    recurringValueChange(event: any) {
+      if (event.target.value === 'Yes') {
+        this.transactionForm.get('frequencyType')?.setValidators([Validators.required]);
+        this.transactionForm.get('frequencyNumber')?.setValidators([Validators.required]);
+      } else {
+        this.transactionForm.controls['frequencyType'].clearValidators();
+        this.transactionForm.controls['frequencyNumber'].clearValidators();
+      }
+      this.transactionForm.get('frequencyType')?.updateValueAndValidity();
+      this.transactionForm.get('frequencyNumber')?.updateValueAndValidity();
+    }
+
+    trackByFn(index: number, item: Transaction): any {
+      return item.id; // Use a unique identifier for the item
     }
   }

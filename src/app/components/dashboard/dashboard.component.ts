@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ManageBudgetDialogComponent } from '../manage-budget-dialog/manage-budget-dialog.component';
 import { Budget } from '../../shared/models/budget';
 import { BudgetService } from '../../shared/services/budget.service';
@@ -22,16 +22,36 @@ export class DashboardComponent implements OnInit {
     public dialog: MatDialog, 
     private budgetService: BudgetService,  
     private transactionService: TransactionService) {}
+    private checkedForBalanceUpdate = false;
 
   ngOnInit(): void {
-    this.budgetService.getBudgets().subscribe(result => {
+    this.budgetService.getBudgetsWithTransactions().subscribe((result) => {
       this.budgets = result;
+      if (!this.checkedForBalanceUpdate) {
+        this.updateBudgetBalancesIfNeeded(this.budgets);
+      }
     });
+  }
+
+  updateBudgetBalancesIfNeeded(budgets: Budget[]) {
+    budgets.forEach((budget: Budget) => {
+        const today = new Date();
+        const budgetLastUpdate = budget.lastUpdated.toDate()
+        console.log(budgetLastUpdate);
+        if (budgetLastUpdate.getDate() != today.getDate() || budgetLastUpdate.getMonth() != today.getMonth() || budgetLastUpdate.getFullYear != today.getFullYear) {
+          this.updateBalanceForDate(budget, true)
+        }
+        this.checkedForBalanceUpdate = true;
+    });
+  }
+
+  updateBalanceForDate(budget: Budget, shouldUpdateDb: boolean) {
+    throw new Error('Method not implemented.');
   }
 
   togglePanelState(index: number): boolean {
     this.expandedCards[index] = !this.expandedCards[index];
-    if (!this.budgets[index].transactions && this.budgets[index].id) {
+    if (this.budgets[index].transactions.length == 0 && this.budgets[index].id) {
         this.transactionService.getAllTransactions(this.budgets[index].id).subscribe(result => {
           if (result)
             this.budgets[index].transactions = result;
@@ -77,7 +97,10 @@ export class DashboardComponent implements OnInit {
       }
     }).afterClosed().subscribe(result => {
       if (result && budget.id) {
+        this.transactionService.deleteAllTransactions(budget.id).then(() => {
+          if (budget.id)
           this.budgetService.deleteBudget(budget.id);
+        })
       }
     });
   }
