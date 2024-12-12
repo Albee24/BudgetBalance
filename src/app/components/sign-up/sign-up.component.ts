@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
+import { passwordMatchValidator } from '../../shared/utils/password.validator';
 
 @Component({
   selector: 'app-sign-up',
@@ -18,17 +19,14 @@ export class SignUpComponent implements OnInit {
 
     createForm() {
       this.signupForm = new FormGroup({
-        email: new FormControl('', Validators.required),
-        password: new FormControl('', Validators.required),
+        email: new FormControl('', [Validators.required,  Validators.email]),
+        password: new FormControl('', [Validators.required, Validators.minLength(6)]),
         confirmPassword: new FormControl('', Validators.required)
-      });
+      }, { validators: passwordMatchValidator });
     }
 
     signUp() {
       if (this.signupForm) {
-       if (this.signupForm.get('password')?.value.equalsIgnoreCase('test')) {
-        console.log('test');
-       }
         if (this.signupForm.valid) {
           this.authService.SignUp(
             this.signupForm.value.email,

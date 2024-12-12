@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "budgetbalance",
+    "public": "dist/budget-balance/browser",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

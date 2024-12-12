@@ -12,13 +12,13 @@
         <mat-label>Password</mat-label>
         <input matInput formControlName="password" type="password" />
         <mat-error *ngIf="loginForm.get('password')!.hasError('required')">Password is required</mat-error>
-        <mat-error *ngIf="loginForm.get('password')!.hasError('minlength')">
-          Password must be at least 6 characters
-        </mat-error>
       </mat-form-field>
-  
+      <a routerLink="/forgot-password" class="link-style">Forgot Password?</a>
       <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
         Log In
       </button>
+      <br/>
+      <br/>
+      Don't have an account yet? <a routerLink="/sign-up" class="link-style">Create one here!</a>
     </form>
   </mat-card>

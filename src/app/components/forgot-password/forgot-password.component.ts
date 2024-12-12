@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({ 
   selector: 'app-forgot-password',
@@ -9,18 +10,20 @@ import { AuthService } from '../../shared/services/auth.service';
 })
 export class ForgotPasswordComponent implements OnInit {
       resetForm!: FormGroup;
-      constructor(private authService: AuthService) {}
+      constructor(private authService: AuthService, private router: Router) {}
 
       ngOnInit(): void {
         this.resetForm = new FormGroup({
-          email: new FormControl('', Validators.required),
+          email: new FormControl('', [Validators.required, Validators.email]),
         });
       }
     
       sendResetLink() {
         if (this.resetForm) {
           if (this.resetForm.valid) {
-            this.authService.ForgotPassword(this.resetForm.value.email);
+            this.authService.ForgotPassword(this.resetForm.value.email).then(() => {
+              this.router.navigate(['/sign-in']);
+             });
           }
         }
       }

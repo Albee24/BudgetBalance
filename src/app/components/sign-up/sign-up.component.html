@@ -24,11 +24,11 @@
         <mat-error *ngIf="signupForm.get('confirmPassword')!.hasError('minlength')">
           Password must be at least 6 characters
         </mat-error>
-        <!-- <mat-error *ngIf="!signupForm.get('password')!.equalsIgnoreCase(signupForm.get('confirmPassword'))">
-            Passwords must match
-          </mat-error> -->
+        
       </mat-form-field>
-  
+      <div *ngIf="signupForm.errors && signupForm.controls['confirmPassword'].dirty">
+        <mat-error *ngIf="signupForm.hasError('passwordMismatch')">Passwords do not match</mat-error>
+      </div>
       <button mat-raised-button color="primary" type="submit" [disabled]="signupForm.invalid">
         Sign Up
       </button>
