@@ -6,6 +6,10 @@ import { BudgetService } from '../../shared/services/budget.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { ManageTransactionsDialogComponent } from '../manage-transactions-dialog/manage-transactions-dialog.component';
 import { TransactionService } from '../../shared/services/transaction.service';
+import { Timestamp } from 'firebase/firestore';
+import { addMonths, differenceInDays, subDays, isSameDay, addWeeks, addDays, addYears } from 'date-fns';
+import { FormControl } from '@angular/forms';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,10 +17,12 @@ import { TransactionService } from '../../shared/services/transaction.service';
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
-
+  transactionDate: Date = new Date();
+  transactionDatePickerControl = new FormControl(this.transactionDate);
   readonly panelOpenState = signal(false);
   budgets: Budget[] = [];
   expandedCards: boolean[] = this.budgets.map(() => true);
+  transactionDateHasChanged = false;
 
   public constructor(
     public dialog: MatDialog, 
@@ -27,26 +33,125 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.budgetService.getBudgetsWithTransactions().subscribe((result) => {
       this.budgets = result;
-      if (!this.checkedForBalanceUpdate) {
+      if (!this.checkedForBalanceUpdate && this.atLeastOneBudgetHasTransactions(this.budgets)) {
         this.updateBudgetBalancesIfNeeded(this.budgets);
       }
     });
+  }
+
+  resetBudgets() {
+    this.transactionDate = new Date();
+    this.transactionDatePickerControl = new FormControl(this.transactionDate);
+    this.budgets = [];
+    this.transactionDateHasChanged = false;
+    this.ngOnInit();
+  }
+
+  onTransactionDateChange($event: MatDatepickerInputEvent<any,any>) {
+    this.transactionDateHasChanged = true;
+    this.transactionDate = $event.target.value;
+    this.budgets.forEach((budget: Budget) => {
+      this.updateBalanceForDate(budget, Timestamp.fromDate($event.target.value), false);
+    });
+  }
+
+  atLeastOneBudgetHasTransactions(budgets: Budget[]): boolean {
+    let hasBudget = false;
+    budgets.forEach((budget: Budget) => {
+      if (budget.transactions && budget.transactions.length > 0) {
+        hasBudget = true;
+        return;
+      }
+    });
+    return hasBudget;
   }
 
   updateBudgetBalancesIfNeeded(budgets: Budget[]) {
     budgets.forEach((budget: Budget) => {
         const today = new Date();
         const budgetLastUpdate = budget.lastUpdated.toDate()
-        console.log(budgetLastUpdate);
-        if (budgetLastUpdate.getDate() != today.getDate() || budgetLastUpdate.getMonth() != today.getMonth() || budgetLastUpdate.getFullYear != today.getFullYear) {
-          this.updateBalanceForDate(budget, true)
+        if (budgetLastUpdate < today) {
+          this.updateBalanceForDate(budget, Timestamp.fromDate(new Date()), true)
         }
         this.checkedForBalanceUpdate = true;
     });
   }
 
-  updateBalanceForDate(budget: Budget, shouldUpdateDb: boolean) {
-    throw new Error('Method not implemented.');
+  updateBalanceForDate(budget: Budget, newDate: Timestamp, shouldUpdateDb: boolean) {
+    let newBalance = 0;
+    if (budget.balance) {
+      newBalance = +budget.balance;
+    }
+    
+    const daysSinceLastUpdate = differenceInDays(newDate.toDate(), budget.lastUpdated.toDate());
+
+    console.log('checking budget ' + budget.name + ' to see if it needs a balance update with transactions');
+    console.log(budget.transactions);
+    budget.transactions.forEach(transaction => {
+      let occurrences = 0;
+      if (transaction.startDate.toDate() <= newDate.toDate()){
+        switch (transaction.frequencyType) {
+          case 'Day': {
+            let lastTransactionDate = transaction.startDate.toDate();
+            while (lastTransactionDate <= newDate.toDate()) {
+              if (lastTransactionDate > budget.lastUpdated.toDate()) {
+                occurrences++;
+              }
+              lastTransactionDate = addDays(lastTransactionDate, transaction.frequencyNumber);
+            }
+            break;
+          }
+          case 'Weeks': {
+            let lastTransactionDate = transaction.startDate.toDate();
+            while (lastTransactionDate <= newDate.toDate()) {
+              if (lastTransactionDate > budget.lastUpdated.toDate()) {
+                occurrences++;
+              }
+              lastTransactionDate = addWeeks(lastTransactionDate, transaction.frequencyNumber);
+            }
+            break;
+          }
+          case 'Months': {
+            let lastTransactionDate = transaction.startDate.toDate();
+            while (lastTransactionDate <= newDate.toDate()) {
+              if (lastTransactionDate > budget.lastUpdated.toDate()) {
+                occurrences++;
+              }
+              lastTransactionDate = addMonths(lastTransactionDate, transaction.frequencyNumber);
+            }
+            break;
+          }
+          case 'Years': {
+            let lastTransactionDate = transaction.startDate.toDate();
+            while (lastTransactionDate <= newDate.toDate()) {
+              if (lastTransactionDate > budget.lastUpdated.toDate()) {
+                occurrences++;
+              }
+              lastTransactionDate = addYears(lastTransactionDate, transaction.frequencyNumber);
+            }
+            break;
+          }
+        }
+      }
+      if (occurrences > 0) {
+        console.log('found a transaction that needs' + occurrences + ' occurence(s) to be applied toward the budget ', transaction);
+      }
+      if (+transaction.amount < 0) {
+        newBalance -= occurrences * +transaction.amount;
+      } else {
+        newBalance += occurrences * +transaction.amount;
+      }
+    });
+
+    if (!isSameDay(budget.lastUpdated.toDate(), newDate.toDate())) {
+      budget.lastUpdated = newDate;
+      budget.balance = '' + newBalance;
+      console.log('updating budget with new balance ' + budget.balance + ' and new updateDate ' + newDate.toString());
+      if (shouldUpdateDb && budget.id) {
+        this.budgetService.updateBudget(budget.id, budget);
+        console.log('and writing it to the db');
+      }
+    }
   }
 
   togglePanelState(index: number): boolean {
@@ -118,5 +223,16 @@ export class DashboardComponent implements OnInit {
         this.transactionService.setAllTransactions(newBudget);
       }
     });
+  }
+
+  duplicateBudget(budget: Budget) {
+    budget.name = budget.name + ' (Copy)'
+    this.budgetService.createBudget(budget).then((newId) => {
+      const newBudget = {
+         ...budget, 
+         id : newId 
+      };
+      this.transactionService.setAllTransactions(newBudget);
+    })
   }
 }

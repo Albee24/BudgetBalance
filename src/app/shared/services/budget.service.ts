@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { combineLatest, forkJoin, Observable, of } from 'rxjs';
+import { combineLatest, forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
 import { Budget } from '../models/budget';
 import { AuthService } from './auth.service';
 import { Transaction } from '../models/transaction';
+import { Timestamp } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -19,12 +20,14 @@ export class BudgetService {
   }
 
   // Create a new budget
-  createBudget(budget: Budget): Promise<void> {
+  createBudget(budget: Budget): Promise<string> {
     console.log('creating new budget', budget);
     const id = this.afs.createId(); // Generates a unique ID
     return this.budgetsCollection.doc(id).set({
       ...budget,
       id: id
+    }).then(() => {
+      return id;
     });
   }
 
@@ -103,4 +106,5 @@ export class BudgetService {
       })
     );
   }
+  
 }

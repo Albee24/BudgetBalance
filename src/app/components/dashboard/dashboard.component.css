@@ -6,10 +6,6 @@
   h1 {
     margin: 0;
   }
-  
-  button {
-    margin-left: auto; /* Push this element to the right */
-  }
 
 /* grid.component.css */
 .card-grid {
@@ -53,7 +49,7 @@
     justify-content: center; /* Center the title */
     align-items: center;    /* Vertically align items */
     position: relative;     /* Allows absolute positioning for the button */
-    height: 60px;           /* Adjust height as needed */
+    height: fit-content;           /* Adjust height as needed */
     padding: 0 16px;        /* Add padding for spacing */
   }
   
@@ -71,4 +67,5 @@
     border: none;
     font-size: 16px;
     cursor: pointer;
+    margin-left: auto; /* Push this element to the right */
   }
