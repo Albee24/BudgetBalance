@@ -14,6 +14,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
     transactionForm!: FormGroup;
     budget!: Budget;
     startingTransactions: Transaction[] = []
+    editId = '';
 
   constructor(
     public dialogRef: MatDialogRef<ManageTransactionsDialogComponent>,
@@ -70,9 +71,17 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
           frequencyNumber: this.transactionForm.controls['frequencyNumber'].value,
           recurring: this.transactionForm.controls['recurring'].value,
           startDate: this.transactionForm.controls['startDate'].value,
-          untilDate: this.transactionForm.controls['untilDate'].value
+          untilDate: this.transactionForm.controls['untilDate'].value,
+          id: this.editId
         }
-        this.budget.transactions?.push(transaction);
+        if (this.editId) {
+          this.budget.transactions = this.budget.transactions.map(foundTransaction =>
+            foundTransaction.id === this.editId ? transaction : foundTransaction
+          );
+          this.editId = '';
+        } else {
+          this.budget.transactions?.push(transaction);
+        }
         this.transactionForm.controls['name'].setValue('');
         this.transactionForm.controls['amount'].setValue('');
         this.transactionForm.controls['frequencyType'].setValue('');
@@ -139,5 +148,20 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
     }
   
     return true;
+  }
+
+  editTransaction(tran: Transaction) {
+    console.log('editing tran', tran);
+    console.log(tran.untilDate, typeof tran.untilDate);
+    this.transactionForm.controls['name'].setValue(tran.name);
+    this.transactionForm.controls['amount'].setValue(tran.amount);
+    this.transactionForm.controls['startDate'].setValue(tran.startDate.toDate());
+    this.transactionForm.controls['recurring'].setValue(tran.recurring);
+    this.transactionForm.controls['untilDate'].setValue(tran.untilDate ? tran.untilDate.toDate() : '');
+    this.transactionForm.controls['frequencyType'].setValue(tran.frequencyType ? tran.frequencyType : '');
+    this.transactionForm.controls['frequencyNumber'].setValue(tran.frequencyNumber ? tran.frequencyNumber : '');
+    if (tran.id) {
+      this.editId = tran.id;
+    }
   }
 }

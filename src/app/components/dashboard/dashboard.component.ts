@@ -7,7 +7,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { ManageTransactionsDialogComponent } from '../manage-transactions-dialog/manage-transactions-dialog.component';
 import { TransactionService } from '../../shared/services/transaction.service';
 import { Timestamp } from 'firebase/firestore';
-import { addMonths, differenceInDays, subDays, isSameDay, addWeeks, addDays, addYears } from 'date-fns';
+import { addMonths, differenceInDays, isSameDay, addWeeks, addDays, addYears, isBefore, isAfter } from 'date-fns';
 import { FormControl } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
@@ -128,6 +128,12 @@ export class DashboardComponent implements OnInit {
                 occurrences++;
               }
               lastTransactionDate = addYears(lastTransactionDate, transaction.frequencyNumber);
+            }
+            break;
+          }
+          default: {
+            if (isBefore(transaction.startDate.toDate(), newDate.toDate())) {
+              occurrences++;
             }
             break;
           }

@@ -22,10 +22,12 @@ export class TransactionService {
         const batch = this.firestore.firestore.batch();
   
         budget.transactions.forEach(transaction => {
-          const docRef = this.firestore.firestore.collection('users/' + this.user.uid + '/budgets/' + budget.id + '/transactions').doc();
-          batch.set(docRef, transaction); 
+          const docRef = this.firestore.firestore
+            .collection(`users/${this.user.uid}/budgets/${budget.id}/transactions`)
+            .doc();
+          transaction.id = docRef.id;
+          batch.set(docRef, transaction);
         });
-
         return batch.commit();
       });
   }
