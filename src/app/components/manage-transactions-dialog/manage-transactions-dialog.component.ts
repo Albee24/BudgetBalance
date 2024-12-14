@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Budget } from '../../shared/models/budget';
 import { TransactionService } from '../../shared/services/transaction.service';
 import { Transaction } from '../../shared/models/transaction';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-manage-transactions-dialog',
@@ -50,6 +51,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
     this.transactionForm = new FormGroup({
       name: new FormControl('',Validators.required),
       amount: new FormControl('',Validators.required),
+      type: new FormControl('',Validators.required),
       startDate: new FormControl('',Validators.required),
       recurring: new FormControl('',Validators.required),
       frequencyType: new FormControl(''),
@@ -67,11 +69,12 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
         const transaction = {
           name: this.transactionForm.controls['name'].value,
           amount: this.transactionForm.controls['amount'].value,
+          type: this.transactionForm.controls['type'].value,
           frequencyType: this.transactionForm.controls['frequencyType'].value,
           frequencyNumber: this.transactionForm.controls['frequencyNumber'].value,
           recurring: this.transactionForm.controls['recurring'].value,
           startDate: this.transactionForm.controls['startDate'].value,
-          untilDate: this.transactionForm.controls['untilDate'].value,
+          untilDate: this.transactionForm.controls['untilDate'].value ? this.transactionForm.controls['untilDate'].value : Timestamp.fromDate(new Date(2199, 11, 31)),
           id: this.editId
         }
         if (this.editId) {
@@ -84,6 +87,7 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
         }
         this.transactionForm.controls['name'].setValue('');
         this.transactionForm.controls['amount'].setValue('');
+        this.transactionForm.controls['type'].setValue('');
         this.transactionForm.controls['frequencyType'].setValue('');
         this.transactionForm.controls['frequencyNumber'].setValue('');
         this.transactionForm.controls['recurring'].setValue('');
@@ -106,15 +110,12 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
     if (newValue === 'Yes') {
       this.transactionForm.get('frequencyType')?.setValidators([Validators.required]);
       this.transactionForm.get('frequencyNumber')?.setValidators([Validators.required]);
-      this.transactionForm.get('untilDate')?.setValidators([Validators.required]);
     } else {
       this.transactionForm.controls['frequencyType'].clearValidators();
       this.transactionForm.controls['frequencyNumber'].clearValidators();
-      this.transactionForm.controls['untilDate'].clearValidators();
     }
     this.transactionForm.get('frequencyType')?.updateValueAndValidity();
     this.transactionForm.get('frequencyNumber')?.updateValueAndValidity();
-    this.transactionForm.get('untilDate')?.updateValueAndValidity();
   }
 
   trackByFn(index: number, item: Transaction): any {
@@ -140,7 +141,10 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
       if (transaction1.id !== transaction2.id ||
           transaction1.name !== transaction2.name ||
           transaction1.amount !== transaction2.amount ||
+          transaction1.type !== transaction2.type ||
           transaction1.recurring !== transaction2.recurring ||
+          transaction1.untilDate !== transaction2.untilDate ||
+          transaction1.startDate !== transaction2.startDate ||
           transaction1.frequencyType !== transaction2.frequencyType ||
           transaction1.frequencyNumber !== transaction2.frequencyNumber) {
         return false;
@@ -151,10 +155,9 @@ export class ManageTransactionsDialogComponent  implements OnInit, AfterViewInit
   }
 
   editTransaction(tran: Transaction) {
-    console.log('editing tran', tran);
-    console.log(tran.untilDate, typeof tran.untilDate);
     this.transactionForm.controls['name'].setValue(tran.name);
     this.transactionForm.controls['amount'].setValue(tran.amount);
+    this.transactionForm.controls['type'].setValue(tran.type);
     this.transactionForm.controls['startDate'].setValue(tran.startDate.toDate());
     this.transactionForm.controls['recurring'].setValue(tran.recurring);
     this.transactionForm.controls['untilDate'].setValue(tran.untilDate ? tran.untilDate.toDate() : '');

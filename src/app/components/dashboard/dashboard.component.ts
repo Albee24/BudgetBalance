@@ -7,7 +7,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { ManageTransactionsDialogComponent } from '../manage-transactions-dialog/manage-transactions-dialog.component';
 import { TransactionService } from '../../shared/services/transaction.service';
 import { Timestamp } from 'firebase/firestore';
-import { addMonths, differenceInDays, isSameDay, addWeeks, addDays, addYears, isBefore, isAfter } from 'date-fns';
+import { addMonths, isSameDay, addWeeks, addDays, addYears, isBefore } from 'date-fns';
 import { FormControl } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
@@ -83,13 +83,9 @@ export class DashboardComponent implements OnInit {
       newBalance = +budget.balance;
     }
     
-    const daysSinceLastUpdate = differenceInDays(newDate.toDate(), budget.lastUpdated.toDate());
-
-    console.log('checking budget ' + budget.name + ' to see if it needs a balance update with transactions');
-    console.log(budget.transactions);
     budget.transactions.forEach(transaction => {
       let occurrences = 0;
-      if (transaction.startDate.toDate() <= newDate.toDate()){
+      if (transaction.startDate.toDate() <= newDate.toDate() && transaction.untilDate.toDate() >= newDate.toDate()){
         switch (transaction.frequencyType) {
           case 'Day': {
             let lastTransactionDate = transaction.startDate.toDate();
@@ -142,10 +138,10 @@ export class DashboardComponent implements OnInit {
       if (occurrences > 0) {
         console.log('found a transaction that needs' + occurrences + ' occurence(s) to be applied toward the budget ', transaction);
       }
-      if (+transaction.amount < 0) {
-        newBalance -= occurrences * +transaction.amount;
+      if (transaction.type == 'Expense') {
+        newBalance -= occurrences * transaction.amount;
       } else {
-        newBalance += occurrences * +transaction.amount;
+        newBalance += occurrences * transaction.amount;
       }
     });
 

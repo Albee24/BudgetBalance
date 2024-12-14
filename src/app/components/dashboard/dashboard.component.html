@@ -44,7 +44,11 @@
             </mat-expansion-panel-header>
             <ul>
                 <li *ngFor="let tran of budgets[i].transactions">
-                    <strong>{{ tran.name }}</strong> {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{ tran | recurringText }}
+                    <strong>{{ tran.name }}</strong>
+                    &nbsp;
+                    <span *ngIf="tran.type === 'Income'">{{ tran.amount | currency:'USD':'symbol':'1.2-2' }}</span> 
+                    <span *ngIf="tran.type === 'Expense'" style="color: red">({{ tran.amount | currency:'USD':'symbol':'1.2-2' }})</span> 
+                    {{ tran | recurringText }}
                 </li>
             </ul>
         </mat-expansion-panel>

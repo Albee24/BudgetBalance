@@ -8,8 +8,18 @@
         </mat-form-field>
         <mat-form-field>
             <mat-label>Amount</mat-label>
-            <input matInput formControlName="amount"/>
+            <input matInput formControlName="amount" type="number"/>
             <mat-error *ngIf="transactionForm.get('amount')!.hasError('required')">Amount is required</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type">
+                <mat-option [value]="'Expense'">Expense</mat-option>
+                <mat-option [value]="'Income'">Income</mat-option>
+            </mat-select>
+            <mat-error *ngIf="transactionForm.get('type')!.hasError('required')">
+                Type selection is required
+            </mat-error>
         </mat-form-field>
         <mat-form-field>
             <mat-label>Date</mat-label>
@@ -63,7 +73,11 @@
         <h3>Transactions</h3>
         <div *ngFor="let tran of budget.transactions; trackBy: trackByFn"> 
             <span>
-                <strong>{{ tran.name }}</strong> {{ tran.amount | currency:'USD':'symbol':'1.2-2' }} {{ tran | recurringText }}
+                <strong>{{ tran.name }}</strong>
+                &nbsp;
+                <span *ngIf="tran.type === 'Income'">{{ tran.amount | currency:'USD':'symbol':'1.2-2' }}</span> 
+                <span *ngIf="tran.type === 'Expense'" style="color: red">({{ tran.amount | currency:'USD':'symbol':'1.2-2' }})</span> 
+                {{ tran | recurringText }}
                 <button mat-icon-button color="primary" (click)="editTransaction(tran)">
                     <mat-icon>edit</mat-icon>
                 </button>
